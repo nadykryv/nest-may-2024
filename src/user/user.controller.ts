@@ -6,28 +6,37 @@ import {
   Patch,
   Param,
   Delete,
+  HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  AccountResponseDto,
+  CreateUserDto,
+  UpdateUserDto,
+  UserQueryDto,
+} from './dto/user.dto';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('User')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  @ApiResponse({ status: HttpStatus.CREATED, type: AccountResponseDto })
+  @Post('/create')
+  async createUser(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
-
-  @Get()
-  findAll() {
-    return this.userService.findAll();
+  //@ApiQuery({ name: 'limit', example: 10 })
+  @Get('/list')
+  findAll(@Query() query: UserQueryDto) {
+    return this.userService.findAll(query);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+    return this.userService.findOne(Number(id));
   }
 
   @Patch(':id')
