@@ -1,45 +1,68 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, IntersectionType } from '@nestjs/swagger';
+import {
+  IsEmail,
+  IsNotEmpty,
+  //IsNumberString,
+  IsOptional,
+  IsString,
+  Matches,
+} from 'class-validator';
+import { Transform } from 'class-transformer';
+import { Match } from '../../common/decorator/password.decorator';
+import { IsCityAllowed } from '../../common/decorator/city.decorator';
 
 export class CreateUserDto {
+  @IsString()
+  @IsNotEmpty()
+  @IsEmail()
+  @ApiProperty({ required: true })
+  @Transform(({ value }) => value.trim())
+  email: string;
+  @IsOptional()
   @ApiProperty({ required: false })
-  id: number;
-  @ApiProperty({ required: false })
-  name: string;
+  firstName: string;
   @ApiProperty({
-    default: 'lviv',
+    default: 'Lviv',
     required: false,
-    description: 'user city',
+    description: 'User city',
     example: 'Poltava',
   })
+  @IsCityAllowed({
+    groups: ['Lviv', 'Odessa', 'Kharkiv'],
+    message: 'City is not allowed',
+  })
   city: string;
-  @ApiProperty({ required: true })
-  email: string;
   @ApiProperty()
   password: string;
+  //@IsNumberString()
   @ApiProperty()
   age: number;
 }
 
-export class AccountResponseDto {
-  @ApiProperty({ required: true })
-  id: number;
-  @ApiProperty({ required: false })
-  name: string;
-  @ApiProperty({
-    default: 'lviv',
-    required: false,
-    description: 'user city',
-    example: 'Poltava',
-  })
-  city: string;
-  @ApiProperty({ required: true })
-  email: string;
-  @ApiProperty()
-  age: number;
+export class PersonalDto {
+  dateBirth: string;
+  lang: string;
+}
+
+export class AccountResponseDto extends IntersectionType(
+  CreateUserDto,
+  PersonalDto,
+) {
   @ApiProperty()
   status: boolean;
 }
-export class UpdateUserDto {}
+
+export class ForgotPassword {
+  @IsString()
+  // @IsStrongPassword()
+  @Matches(/^\S*(?=\S{8,})(?=\S*[A-Z])(?=\S*[\d])\S*$/, {
+    message: 'Password must have 1 upper case1111',
+  })
+  password: string;
+  @IsNotEmpty()
+  @Match('password', { message: 'Password must match' })
+  repeatPassword: string;
+}
 
 export class UserQueryDto {
   @ApiProperty()
@@ -48,3 +71,5 @@ export class UserQueryDto {
   sort: string;
   page: string;
 }
+
+export class UpdateUserDto {}
