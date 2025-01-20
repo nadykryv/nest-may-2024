@@ -5,7 +5,7 @@ import { CreateUserDto, UpdateUserDto, UserQueryDto } from './dto/user.dto';
 export class UserService {
   private usersList = [];
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto,) {
     const index = new Date().valueOf();
     this.usersList.push({
       ...createUserDto,
