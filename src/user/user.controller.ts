@@ -13,7 +13,8 @@ import { UserService } from './user.service';
 import {
   AccountResponseDto,
   CreateUserDto,
-  UpdateUserDto, UserItemDto,
+  UpdateUserDto,
+  UserItemDto,
 } from './dto/user.dto';
 import { ApiExtraModels, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BaseQueryDto } from '../common/validator/base.query.validator';

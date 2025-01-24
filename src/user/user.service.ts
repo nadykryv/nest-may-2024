@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto, UpdateUserDto} from './dto/user.dto';
+import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { BaseQueryDto } from '../common/validator/base.query.validator';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../database/entities/user.entity';
 import { Repository } from 'typeorm';
+import { paginateRawAndEntities } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class UserService {
@@ -21,8 +22,30 @@ export class UserService {
     return this.usersList[0];
   }
 
-  findAll(data: BaseQueryDto) {
-    return this.usersList;
+  async findAll(query?: BaseQueryDto) {
+    const options = {
+      page: query?.page || 1,
+      limit: query?.limit || 10,
+    };
+    const queryBuilder = await this.userRepository.createQueryBuilder('user');
+    queryBuilder
+      .select('email, "firstName", age, id, "createdAt')
+      .where({ isActive: true });
+    if (query.search) {
+      queryBuilder.andWhere(`LOWER("firstName) LIKE '${query.search}'`);
+    }
+
+    const [pagination, rawEntities] = await paginateRawAndEntities(
+      queryBuilder,
+      options,
+    );
+
+    return {
+      page: pagination.meta.currentPage,
+      pages: pagination.meta.totalPages,
+      countItems: pagination.meta.totalItems,
+      entities: rawEntities,
+    };
   }
 
   findOne(id: number) {

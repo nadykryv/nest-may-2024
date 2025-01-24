@@ -14,6 +14,12 @@ export class AuthService {
   ) {}
 
   async singUpUser(data: CreateUserDto) {
+    const findUser = await this.userRepository.findOne({
+      where: { email: data.email },
+    });
+    if (!findUser) {
+      throw new BadRequestException('User with email already exists');
+    }
     const password = await bcrypt.hash(data.password, 10);
     const user = await this.userRepository.save(
       this.userRepository.create({

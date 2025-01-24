@@ -14,11 +14,11 @@ export class BaseQueryDto {
 
   @ApiProperty({ required: false, default: 1 })
   @IsOptional()
-  page: string;
+  page = 1;
 
   @ApiProperty({ required: false, default: 10 })
   @IsOptional()
-  limit: string;
+  limit = 10;
 
   @ApiProperty({ required: false })
   @IsString()
