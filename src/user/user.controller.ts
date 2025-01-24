@@ -13,12 +13,13 @@ import { UserService } from './user.service';
 import {
   AccountResponseDto,
   CreateUserDto,
-  UpdateUserDto,
-  UserQueryDto,
+  UpdateUserDto, UserItemDto,
 } from './dto/user.dto';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiExtraModels, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { BaseQueryDto } from '../common/validator/base.query.validator';
 
 @ApiTags('User')
+@ApiExtraModels(UserItemDto)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -30,7 +31,7 @@ export class UserController {
   }
   //@ApiQuery({ name: 'limit', example: 10 })
   @Get('/list')
-  findAll(@Query() query: UserQueryDto) {
+  findAll(@Query() query: BaseQueryDto) {
     return this.userService.findAll(query);
   }
 

@@ -1,6 +1,5 @@
-import { Column, Entity,  PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
-
 
 @Entity()
 export class User extends BaseEntity {
@@ -27,5 +26,4 @@ export class User extends BaseEntity {
 
   @Column({ default: false })
   isActive: boolean;
-
 }

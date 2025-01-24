@@ -1,7 +1,7 @@
 import { ApiProperty, IntersectionType } from '@nestjs/swagger';
 import {
   IsEmail,
-  IsNotEmpty,
+  IsNotEmpty, IsNumber,
   //IsNumberString,
   IsOptional,
   IsString,
@@ -18,58 +18,75 @@ export class CreateUserDto {
   @ApiProperty({ required: true })
   @Transform(({ value }) => value.trim())
   email: string;
+
   @IsOptional()
+  @IsString()
   @ApiProperty({ required: false })
   firstName: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({ required: false })
+  lastName: string;
+
   @ApiProperty({
     default: 'Lviv',
     required: false,
     description: 'User city',
     example: 'Poltava',
   })
+  @IsOptional()
   @IsCityAllowed({
     groups: ['Lviv', 'Odessa', 'Kharkiv'],
     message: 'City is not allowed',
   })
   city: string;
-  @ApiProperty()
+
+  @IsString()
+  @Matches(/^\S*(?=\S{8,})(?=\S*[A-Z])(?=\S*[\d])\S*$/, {
+    message: 'Password must have 1 upper case',
+  })
+  @IsNotEmpty()
   password: string;
-  //@IsNumberString()
+
+  @IsNumber()
+  @IsOptional()
   @ApiProperty()
   age: number;
-}
-
-export class PersonalDto {
-  dateBirth: string;
-  lang: string;
-}
-
-export class AccountResponseDto extends IntersectionType(
-  CreateUserDto,
-  PersonalDto,
-) {
-  @ApiProperty()
-  status: boolean;
 }
 
 export class ForgotPassword {
   @IsString()
   // @IsStrongPassword()
   @Matches(/^\S*(?=\S{8,})(?=\S*[A-Z])(?=\S*[\d])\S*$/, {
-    message: 'Password must have 1 upper case1111',
+    message: 'Password must have 1 upper case',
   })
   password: string;
+
   @IsNotEmpty()
   @Match('password', { message: 'Password must match' })
   repeatPassword: string;
 }
 
-export class UserQueryDto {
+export class AccountResponseDto extends CreateUserDto {
   @ApiProperty()
-  limit: string;
+  status: boolean;
+}
+
+export class SingUpDto  {
   @ApiProperty()
-  sort: string;
-  page: string;
+  id: string;
+  @ApiProperty()
+  email: string;
+  @ApiProperty()
+  createdAt: Date;
+}
+
+export class UserItemDto extends SingUpDto {
+  @ApiProperty()
+  firstName: string;
+  @ApiProperty()
+  age: number;
 }
 
 export class UpdateUserDto {}
