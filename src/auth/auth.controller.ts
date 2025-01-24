@@ -23,7 +23,7 @@ export class AuthController {
     return this.authService.singUpUser(body);
   }
 
- // @Post()
+  // @Post()
   //   create(@Body() createAuthDto: ForgotPassword) {
   //     return this.authService.create(createAuthDto);
   //   }

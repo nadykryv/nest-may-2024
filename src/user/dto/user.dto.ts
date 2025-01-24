@@ -1,7 +1,8 @@
 import { ApiProperty, IntersectionType } from '@nestjs/swagger';
 import {
   IsEmail,
-  IsNotEmpty, IsNumber,
+  IsNotEmpty,
+  IsNumber,
   //IsNumberString,
   IsOptional,
   IsString,
@@ -73,7 +74,7 @@ export class AccountResponseDto extends CreateUserDto {
   status: boolean;
 }
 
-export class SingUpDto  {
+export class SingUpDto {
   @ApiProperty()
   id: string;
   @ApiProperty()
