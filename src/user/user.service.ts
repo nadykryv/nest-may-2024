@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { CreateUserDto, UpdateUserDto, UserItemDto } from './dto/user.dto';
 import { BaseQueryDto } from '../common/validator/base.query.validator';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../database/entities/user.entity';
@@ -29,10 +29,10 @@ export class UserService {
     };
     const queryBuilder = await this.userRepository.createQueryBuilder('user');
     queryBuilder
-      .select('email, "firstName", age, id, "createdAt')
+      .select('email, "firstName", age, id, "createdAt"')
       .where({ isActive: true });
     if (query.search) {
-      queryBuilder.andWhere(`LOWER("firstName) LIKE '${query.search}'`);
+      queryBuilder.andWhere(`LOWER("firstName") LIKE '%${query.search}%'`);
     }
 
     const [pagination, rawEntities] = await paginateRawAndEntities(
@@ -44,7 +44,7 @@ export class UserService {
       page: pagination.meta.currentPage,
       pages: pagination.meta.totalPages,
       countItems: pagination.meta.totalItems,
-      entities: rawEntities,
+      entities: rawEntities as [UserItemDto],
     };
   }
 
