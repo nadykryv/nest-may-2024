@@ -18,6 +18,7 @@ import {
 } from './dto/user.dto';
 import { ApiExtraModels, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BaseQueryDto } from '../common/validator/base.query.validator';
+import { ApiPaginatedResponse } from '../common/interface/response.interface';
 
 @ApiTags('User')
 @ApiExtraModels(UserItemDto)
@@ -30,7 +31,7 @@ export class UserController {
   async createUser(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
-  //@ApiQuery({ name: 'limit', example: 10 })
+  @ApiPaginatedResponse('entities', UserItemDto)
   @Get('/list')
   findAll(@Query() query: BaseQueryDto) {
     return this.userService.findAll(query);

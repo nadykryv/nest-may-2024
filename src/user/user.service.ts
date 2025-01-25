@@ -30,7 +30,7 @@ export class UserService {
     const queryBuilder = await this.userRepository.createQueryBuilder('user');
     queryBuilder
       .select('email, "firstName", age, id, "createdAt"')
-      .where({ isActive: true });
+      .where({ isActive: false });
     if (query.search) {
       queryBuilder.andWhere(`LOWER("firstName") LIKE '%${query.search}%'`);
     }
