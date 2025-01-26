@@ -28,6 +28,9 @@ export class User extends BaseEntity {
   @Column({ default: false })
   isActive: boolean;
 
+  @Column({ nullable: true, default: null })
+  phone: string;
+
   @OneToMany(() => Post, (entity) => entity.user)
   posts?: Post[];
 }
