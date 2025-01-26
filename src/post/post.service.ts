@@ -1,11 +1,30 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Post } from '../database/entities/post.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class PostService {
-  create(createPostDto: CreatePostDto) {
-    return 'This action adds a new post';
+  private logger: Logger;
+  constructor(
+    @InjectRepository(Post)
+    private readonly postRepository: Repository<Post>,
+  ) {}
+  async create(data: CreatePostDto) {
+    try {
+      const post = await this.postRepository.save(
+        this.postRepository.create({
+          ...data,
+          user_id: '967895d5-72db-48d5-9370-6ae3515e00c2',
+        }),
+      );
+      return post;
+    } catch (err) {
+      this.logger.error(err);
+      throw new BadRequestException('Creat post failed.');
+    }
   }
 
   findAll() {
