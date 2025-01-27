@@ -4,7 +4,7 @@ import { BaseQueryDto } from '../common/validator/base.query.validator';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../database/entities/user.entity';
 import { Repository } from 'typeorm';
-//import { paginateRawAndEntities } from 'nestjs-typeorm-paginate';
+import { paginateRawAndEntities } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class UserService {

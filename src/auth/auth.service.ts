@@ -20,7 +20,7 @@ export class AuthService {
     const findUser = await this.userRepository.findOne({
       where: { email: data.email },
     });
-    if (!findUser) {
+    if (findUser) {
       throw new BadRequestException('User with email already exists');
     }
     const password = await bcrypt.hash(data.password, 10);
@@ -31,7 +31,7 @@ export class AuthService {
       }),
     );
 
-    await this.redisClient.setEx(this.redisUserKey, 5, JSON.stringify(user));
+    await this.redisClient.setEx(this.redisUserKey, 5 * 60, JSON.stringify(user));
 
     const userInRedis = JSON.parse(
       await this.redisClient.get(this.redisUserKey),

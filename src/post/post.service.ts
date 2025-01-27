@@ -17,7 +17,7 @@ export class PostService {
       const post = await this.postRepository.save(
         this.postRepository.create({
           ...data,
-          user_id: '967895d5-72db-48d5-9370-6ae3515e00c2',
+          user_id: '5392a171-0e96-4308-8046-b8f2078a93b5',
         }),
       );
       return post;
