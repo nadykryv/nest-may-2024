@@ -31,12 +31,16 @@ export class AuthService {
       }),
     );
 
-    await this.redisClient.setEx(this.redisUserKey, 5 * 60, JSON.stringify(user));
+    await this.redisClient.setEx(
+      this.redisUserKey,
+      5 * 60,
+      JSON.stringify(user),
+    );
 
     const userInRedis = JSON.parse(
       await this.redisClient.get(this.redisUserKey),
     );
-     //const userInRedisSecond = JSON.parse(await this.redisClient.del('user'));
+    //const userInRedisSecond = JSON.parse(await this.redisClient.del('user'));
     console.log(userInRedis);
 
     return {
