@@ -22,7 +22,7 @@ export class UserService {
     return this.usersList[0];
   }
 
-  async findAll(query?: BaseQueryDto): Promise<any> {
+  async findAll(query?: BaseQueryDto, user?: any): Promise<any> {
     const options = {
       page: +query?.page || 1,
       limit: +query?.limit || 10,
@@ -58,7 +58,7 @@ export class UserService {
     //   entities: rawEntities as [UserItemDto],
     // };
 
-    const [entities, total] = await this.userRepository.findAndCount({
+    const [ entities, total] = await this.userRepository.findAndCount({
       where: { isActive: false },
       select: {
         email: true,
@@ -70,21 +70,21 @@ export class UserService {
       },
       skip: (options.page - 1) * options.limit,
       take: options.limit,
-    });
+    })
 
     return {
       page: options.page,
-      pages: Math.ceil(total / options.limit),
-      countItems: total,
+      pages: Math.ceil( total / options.limit),
+      countItems:  total,
       entities: entities,
     };
   }
 
   findOne(id: number) {
-    return this.usersList.find((user) => user.id === id);
+    return this.usersList.find((user) => user.id == id);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  update(id: number) {
     return `This action updates a #${id} user`;
   }
 

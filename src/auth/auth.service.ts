@@ -1,16 +1,17 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { UpdateAuthDto } from './dto/update-auth.dto';
-import { ForgotPassword, CreateUserDto } from '../user/dto/user.dto';
+import {BadRequestException, Injectable, UnauthorizedException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../database/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { InjectRedisClient, RedisClient } from '@webeleon/nestjs-redis';
-import { JwtService } from '@nestjs/jwt';
+import {JwtService} from "@nestjs/jwt";
+import {InjectRedisClient, RedisClient} from "@webeleon/nestjs-redis";
+
+import { UpdateAuthDto } from './dto/update-auth.dto';
+import { ForgotPassword, SingUpDto, CreateUserDto } from '../user/dto/user.dto';
+import { User } from '../database/entities/user.entity';
 
 @Injectable()
 export class AuthService {
-  private redisUserKey = 'user-register';
+  private redisUserKey = 'user-token';
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -61,8 +62,8 @@ export class AuthService {
   }
 
   async singIn(userId: string, userEmail: string): Promise<string> {
-       return this.jwtService.sign({id: userId, email: userEmail});
-     }
+    return this.jwtService.sign({id: userId, email: userEmail});
+  }
 
   create(data: ForgotPassword) {
     if (data.password !== data.repeatPassword) {

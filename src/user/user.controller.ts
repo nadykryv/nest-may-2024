@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
   HttpStatus,
-  Query,
+  Query, UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
@@ -18,10 +18,14 @@ import {
 } from './dto/user.dto';
 import { ApiExtraModels, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BaseQueryDto } from '../common/validator/base.query.validator';
-import { ApiPaginatedResponse } from '../common/interface/response.interface';
+import { ApiPaginatedResponse, PaginatedDto } from '../common/interface/response.interface';
+import { AuthGuard } from '@nestjs/passport';
+import { RoleGuard } from '../common/guards/role.guard';
+import { Roles } from '../common/decorator/roles.decorator';
 
+ @UseGuards(AuthGuard())
 @ApiTags('User')
-@ApiExtraModels(UserItemDto)
+@ApiExtraModels(UserItemDto, PaginatedDto)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -31,6 +35,9 @@ export class UserController {
   async createUser(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
+
+  @Roles('Admin', 'Manager')
+  @UseGuards(AuthGuard(), RoleGuard)
   @ApiPaginatedResponse('entities', UserItemDto)
   @Get('/list')
   findAll(@Query() query: BaseQueryDto) {
@@ -42,9 +49,11 @@ export class UserController {
     return this.userService.findOne(Number(id));
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @Roles('Admin')
+  @UseGuards(AuthGuard(), RoleGuard)
+  @Patch('/roles/:id')
+  update(@Param('id') id: string) {
+    return this.userService.update(+id);
   }
 
   @Delete(':id')
