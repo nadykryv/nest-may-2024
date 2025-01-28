@@ -1,9 +1,13 @@
-import {BadRequestException, Injectable, UnauthorizedException} from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import {JwtService} from "@nestjs/jwt";
-import {InjectRedisClient, RedisClient} from "@webeleon/nestjs-redis";
+import { JwtService } from '@nestjs/jwt';
+import { InjectRedisClient, RedisClient } from '@webeleon/nestjs-redis';
 
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { ForgotPassword, SingUpDto, CreateUserDto } from '../user/dto/user.dto';
@@ -33,7 +37,11 @@ export class AuthService {
 
     const token = await this.singIn(user.id, user.email);
 
-    await this.redisClient.setEx(`${this.redisUserKey}-${user.id}`, 24 * 60 * 60, token);
+    await this.redisClient.setEx(
+      `${this.redisUserKey}-${user.id}`,
+      24 * 60 * 60,
+      token,
+    );
 
     // logout
     // await this.redisClient.del(`${this.redisUserKey}-${user.id}`);
@@ -53,7 +61,7 @@ export class AuthService {
       where: {
         id: userId,
         email: userEmail,
-      }
+      },
     });
     if (!user) {
       throw new UnauthorizedException();
@@ -62,7 +70,7 @@ export class AuthService {
   }
 
   async singIn(userId: string, userEmail: string): Promise<string> {
-    return this.jwtService.sign({id: userId, email: userEmail});
+    return this.jwtService.sign({ id: userId, email: userEmail });
   }
 
   create(data: ForgotPassword) {

@@ -58,7 +58,7 @@ export class UserService {
     //   entities: rawEntities as [UserItemDto],
     // };
 
-    const [ entities, total] = await this.userRepository.findAndCount({
+    const [entities, total] = await this.userRepository.findAndCount({
       where: { isActive: false },
       select: {
         email: true,
@@ -70,12 +70,12 @@ export class UserService {
       },
       skip: (options.page - 1) * options.limit,
       take: options.limit,
-    })
+    });
 
     return {
       page: options.page,
-      pages: Math.ceil( total / options.limit),
-      countItems:  total,
+      pages: Math.ceil(total / options.limit),
+      countItems: total,
       entities: entities,
     };
   }

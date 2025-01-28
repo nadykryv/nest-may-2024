@@ -7,7 +7,8 @@ import {
   Param,
   Delete,
   HttpStatus,
-  Query, UseGuards,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
@@ -18,12 +19,15 @@ import {
 } from './dto/user.dto';
 import { ApiExtraModels, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BaseQueryDto } from '../common/validator/base.query.validator';
-import { ApiPaginatedResponse, PaginatedDto } from '../common/interface/response.interface';
+import {
+  ApiPaginatedResponse,
+  PaginatedDto,
+} from '../common/interface/response.interface';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleGuard } from '../common/guards/role.guard';
 import { Roles } from '../common/decorator/roles.decorator';
 
- @UseGuards(AuthGuard())
+@UseGuards(AuthGuard())
 @ApiTags('User')
 @ApiExtraModels(UserItemDto, PaginatedDto)
 @Controller('user')
