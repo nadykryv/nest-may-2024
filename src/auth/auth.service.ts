@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { ForgotPassword, CreateUserDto } from '../user/dto/user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +6,7 @@ import { User } from '../database/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { InjectRedisClient, RedisClient } from '@webeleon/nestjs-redis';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -14,41 +15,54 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRedisClient() private readonly redisClient: RedisClient,
+    private readonly jwtService: JwtService,
   ) {}
 
-  async singUpUser(data: CreateUserDto) {
+  async singUpUser(data: CreateUserDto): Promise<{ accessToken: string }> {
     const findUser = await this.userRepository.findOne({
       where: { email: data.email },
     });
     if (findUser) {
-      throw new BadRequestException('User with email already exists');
+      throw new BadRequestException('User with this email already exist.');
     }
     const password = await bcrypt.hash(data.password, 10);
-    const user = await this.userRepository.save(
-      this.userRepository.create({
-        ...data,
-        password,
-      }),
+    const user: User = await this.userRepository.save(
+      this.userRepository.create({ ...data, password }),
     );
 
-    await this.redisClient.setEx(
-      this.redisUserKey,
-      5 * 60,
-      JSON.stringify(user),
-    );
+    const token = await this.singIn(user.id, user.email);
 
-    const userInRedis = JSON.parse(
-      await this.redisClient.get(this.redisUserKey),
-    );
-    //const userInRedisSecond = JSON.parse(await this.redisClient.del('user'));
-    console.log(userInRedis);
+    await this.redisClient.setEx(`${this.redisUserKey}-${user.id}`, 24 * 60 * 60, token);
 
-    return {
-      id: user.id,
-      email: user.email,
-      createdAt: user.createdAt,
-    };
+    // logout
+    // await this.redisClient.del(`${this.redisUserKey}-${user.id}`);
+
+    // const userInRedis = JSON.parse(await this.redisClient.get(this.redisUserKey));
+    // // const userInRedisSecond = JSON.parse(await this.redisClient.del('user'));
+    // console.log(userInRedis);
+
+    return { accessToken: token };
   }
+
+  async validateUser(userId: string, userEmail: string): Promise<User> {
+    if (!userId || !userEmail) {
+      throw new UnauthorizedException();
+    }
+    const user = this.userRepository.findOne({
+      where: {
+        id: userId,
+        email: userEmail,
+      }
+    });
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    return user;
+  }
+
+  async singIn(userId: string, userEmail: string): Promise<string> {
+       return this.jwtService.sign({id: userId, email: userEmail});
+     }
 
   create(data: ForgotPassword) {
     if (data.password !== data.repeatPassword) {
