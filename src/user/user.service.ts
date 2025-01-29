@@ -6,6 +6,7 @@ import { User } from '../database/entities/user.entity';
 import { Repository } from 'typeorm';
 import { paginateRawAndEntities } from 'nestjs-typeorm-paginate';
 import { PATH_TO_IMAGE } from '../common/utils/upload.utils';
+import * as fs from 'node:fs';
 
 @Injectable()
 export class UserService {
@@ -81,8 +82,20 @@ export class UserService {
     };
   }
 
-  findOne(id: number, file?: any) {
-    console.log(file);
+  findOne(id: number, fileName?: any) {
+    if (fileName) {
+      const avatarPath = `${PATH_TO_IMAGE}/${fileName}`;
+      console.log(avatarPath); /// { avatar: avatarPath }
+    }
+
+    return this.usersList.find((user) => user.id == id);
+  }
+  updateOne(id: number, body?: any) {
+    try {
+      fs.unlinkSync(`./upload/1286888386033841.png`);
+    } catch (err) {
+      console.log(err);
+    }
     return this.usersList.find((user) => user.id == id);
   }
 

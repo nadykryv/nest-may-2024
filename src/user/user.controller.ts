@@ -88,8 +88,33 @@ export class UserController {
   }
 
   @Patch('gallery')
-  uploadImages(@Param('id') id: string) {
-    return this.userService.findOne(Number(id));
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'image', maxCount: 1 },
+        { name: 'imageLogo', maxCount: 1 },
+      ],
+      {
+        storage: diskStorage({
+          destination: `.${PATH_TO_IMAGE}`,
+          filename: editFileName,
+        }),
+      },
+    ),
+  )
+  updateImages(
+    @Param('id') id: string,
+    @UploadedFiles()
+    files: { image?: Express.Multer.File[]; imageLogo?: Express.Multer.File[] },
+    @Body() body: any,
+  ) {
+    if (files?.image) {
+      body.photo = `${PATH_TO_IMAGE}/${files.image[0].filename}`;
+    }
+    if (files?.imageLogo) {
+      body.logo = `${PATH_TO_IMAGE}/${files.imageLogo[0].filename}`;
+    }
+    return this.userService.updateOne(Number(id), body);
   }
 
   //@Get(':id')
