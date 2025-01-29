@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../database/entities/user.entity';
 import { Repository } from 'typeorm';
 import { paginateRawAndEntities } from 'nestjs-typeorm-paginate';
+import { PATH_TO_IMAGE } from '../common/utils/upload.utils';
 
 @Injectable()
 export class UserService {
@@ -80,7 +81,8 @@ export class UserService {
     };
   }
 
-  findOne(id: number) {
+  findOne(id: number, file?: any) {
+    console.log(file);
     return this.usersList.find((user) => user.id == id);
   }
 

@@ -2,6 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import * as express from 'express';
+import { join } from 'path';
+import * as process from 'process';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -10,9 +13,11 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
-      //disableErrorMessages: true,
+      // disableErrorMessages: true,
     }),
   );
+
+  app.use('/upload', express.static(join(process.cwd(), 'upload')));
 
   const config = new DocumentBuilder()
     .setTitle('Nest')
