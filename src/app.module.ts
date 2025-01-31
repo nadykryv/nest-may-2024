@@ -24,7 +24,7 @@ import { SocketModule } from './socket/socket.module';
       isGlobal: true,
     }),
     DatabaseModule,
-    SocketModule
+    SocketModule,
   ],
   controllers: [AppController],
   providers: [AppService],

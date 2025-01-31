@@ -5,6 +5,6 @@ import { SocketGateway } from './socket.gatewy';
 @Module({
   imports: [AuthModule],
   providers: [SocketGateway],
-  exports: [SocketGateway]
+  exports: [SocketGateway],
 })
 export class SocketModule {}

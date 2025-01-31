@@ -7,12 +7,14 @@ import { Repository } from 'typeorm';
 import { paginateRawAndEntities } from 'nestjs-typeorm-paginate';
 import { PATH_TO_IMAGE } from '../common/utils/upload.utils';
 import * as fs from 'node:fs';
+import { SocketGateway } from '../socket/socket.gatewy';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly socket: SocketGateway,
   ) {}
   private usersList = [];
   async create(createUserDto: CreateUserDto) {
@@ -90,13 +92,22 @@ export class UserService {
 
     return this.usersList.find((user) => user.id == id);
   }
-  updateOne(id: number, body?: any) {
-    try {
-      fs.unlinkSync(`./upload/1286888386033841.png`);
-    } catch (err) {
-      console.log(err);
+  async updateOne(id: number, body?: any, user?: any) {
+    //try {
+    //       fs.unlinkSync(`./upload/1286888386033841.png`);
+    //     } catch (err) {
+    //       console.log(err);
+    //     }
+
+    if (user) {
+      await this.socket.sendMessage(user.id, 'new-massage', {
+        message: 'Hello!',
+        date: '',
+      });
     }
-    return this.usersList.find((user) => user.id == id);
+
+    //return this.usersList.find((user) => user.id == id);
+    return true;
   }
 
   update(id: number) {

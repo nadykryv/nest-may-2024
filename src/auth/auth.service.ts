@@ -80,22 +80,25 @@ export class AuthService {
   async login(data: any) {
     const findUser = await this.userRepository.findOne({
       where: { email: data.email },
-    })
+    });
 
     if (!findUser) {
       throw new BadRequestException('Wrong email or password.');
     }
 
-    if (!await this.compareHash(data.password, findUser.password)) {
+    if (!(await this.compareHash(data.password, findUser.password))) {
       throw new BadRequestException('Wrong email or password.');
     }
 
     const token = await this.singIn(findUser.id, findUser.email);
 
-    await this.redisClient.setEx(`${this.redisUserKey}-${findUser.id}`, 24 * 60 * 60, token);
+    await this.redisClient.setEx(
+      `${this.redisUserKey}-${findUser.id}`,
+      24 * 60 * 60,
+      token,
+    );
 
     return { accessToken: token };
-
   }
 
   async validate(token: string) {
